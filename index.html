@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Comic-Scanner</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Comics">
+<meta name="theme-color" content="#1f3a5f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E">
+<style>
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: #f2f4f8; color: #1d2733; }
+  .lade { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 16px; text-align: center; }
+  .kreis { width: 42px; height: 42px; border: 4px solid #d6dde8; border-top-color: #1f3a5f; border-radius: 50%; animation: drehen 1s linear infinite; }
+  @keyframes drehen { to { transform: rotate(360deg); } }
+  button { font-size: 16px; padding: 10px 18px; border-radius: 10px; border: 0; background: #1f3a5f; color: #fff; }
+</style>
+</head>
+<body>
+<!--
+  Comic-Scanner – Startseite auf GitHub Pages
+  Diese kleine Seite holt die eigentliche App direkt aus dem Google-Skript
+  (ohne Google-Anmeldung) und zeigt sie an. Alle Daten bleiben in der
+  Google-Tabelle. Ohne PIN kommt niemand an eine Sammlung.
+  Änderungen an der App macht man im Google-Skript – hier muss nichts geändert werden.
+-->
+<div class="lade" id="lade">
+  <div style="font-size:48px">📚</div>
+  <div class="kreis"></div>
+  <div id="text">Comic-Scanner wird geladen …</div>
+</div>
+<script>
+  // Adresse der Google-Web-App (Comic-Scanner)
+  var API_URL = 'https://script.google.com/macros/s/AKfycbwlho_JTqSD5Wi21htidEj8wiJG2CLamkvDMlwva1TSPyRz4b82oV5MHX601NeHgVjC/exec';
+
+  function laden() {
+    document.getElementById('text').textContent = 'Comic-Scanner wird geladen …';
+    fetch(API_URL + '?roh=1', { redirect: 'follow' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('Fehler ' + r.status);
+        return r.text();
+      })
+      .then(function (html) {
+        if (html.indexOf('Comic-Scanner') < 0) throw new Error('Antwort unbekannt');
+        // Die geladene App ersetzt diese Ladeseite komplett
+        document.open();
+        document.write(html);
+        document.close();
+      })
+      .catch(function (e) {
+        document.getElementById('lade').innerHTML =
+          '<div style="font-size:48px">📚</div>' +
+          '<div>Der Comic-Scanner konnte nicht geladen werden (' + e.message + ').<br>Bitte Internet prüfen.</div>' +
+          '<button onclick="location.reload()">Nochmal versuchen</button>';
+      });
+  }
+  laden();
+</script>
+</body>
+</html>
